@@ -1,0 +1,74 @@
+server:
+  port: 15602
+
+onenet_ip: http://localhost:15545
+sofia_ip: http://localhost:15502
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: ONENET
+          uri: ${onenet_ip}
+          predicates:
+            - Path=/api/check-connectivity/**
+        - id: SOFIA
+          uri: ${sofia_ip}
+          predicates:
+            - Path=/api/**
+
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: SOFIA
+#          uri: lb://USER-SERVICE
+#          predicates:
+#          - Path=/user/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: USER-SERVICE
+#                fallbackuri: forward:/userServiceFallBack
+#        - id: MENU-SERVICE
+#          uri: lb://MENU-SERVICE
+#          predicates:
+#            - Path=/menu/**
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: MENU-SERVICE
+#                fallbackuri: forward:/menuServiceFallBack
+
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
+#  instance:
+#    hostname: localhost
+
+#hystrix:
+#  command:
+#    fallbackcmd:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 4000
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: hystrix.stream
+
